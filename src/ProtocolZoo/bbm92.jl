@@ -1,5 +1,7 @@
 using Random: rand
 
+export BBM92Prot, bbm92_log, sifted_key
+
 """
 $TYPEDEF
 
@@ -47,6 +49,7 @@ function BBM92Prot(net::RegisterNet, nodeA::Int, nodeB::Int; kwargs...)
 end
 
 permits_virtual_edge(::Type{BBM92Prot}) = true
+_protocol_nodes(prot::BBM92Prot) = (prot.nodeA, prot.nodeB)
 
 protocol_catalog_metadata(::Type{BBM92Prot}) = (
     attachment=:edge,
