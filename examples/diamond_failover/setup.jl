@@ -79,7 +79,8 @@ function run_diamond_scenario(; failed_path::Symbol=:none,
     sim, net, graph, consumer = prepare_diamond_simulation(; failed_path, kwargs...)
     run(sim, duration)
     deliveries = length(consumer._log)
-    mean_xx = isempty(consumer._log) ? NaN : sum(entry.obs1 for entry in consumer._log) / deliveries
-    mean_zz = isempty(consumer._log) ? NaN : sum(entry.obs2 for entry in consumer._log) / deliveries
+    # EntanglementConsumer stores obs1=Z⊗Z and obs2=X⊗X.
+    mean_zz = isempty(consumer._log) ? NaN : sum(entry.obs1 for entry in consumer._log) / deliveries
+    mean_xx = isempty(consumer._log) ? NaN : sum(entry.obs2 for entry in consumer._log) / deliveries
     return (; sim, net, graph, consumer, deliveries, mean_xx, mean_zz)
 end
