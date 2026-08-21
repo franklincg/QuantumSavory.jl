@@ -4,6 +4,7 @@ using Graphs
 using ConcurrentSim
 using ResumableFunctions
 using NetworkLayout
+using Random
 
 const DIAMOND_EDGES = ((1, 2), (2, 4), (1, 3), (3, 4))
 const UPPER_PATH_EDGES = Set(((1, 2), (2, 4)))
