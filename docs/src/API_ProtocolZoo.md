@@ -15,7 +15,7 @@ protocols, including their discrete-event control flow.
 ## What ProtocolZoo Is For
 
 `ProtocolZoo` contains ready-to-run protocol components such as entanglers,
-swappers, trackers, consumers, and switch-like controllers.
+swappers, trackers, consumers, QKD primitives, and switch-like controllers.
 
 These are not just code samples. They are structured `AbstractProtocol`
 implementations meant to be launched inside a simulation with `@process`.
@@ -54,10 +54,34 @@ In practice, that means one protocol can:
 
 - generate entanglement and tag the resulting slots,
 - another protocol can query those tags and perform a swap,
-- and a tracker or consumer can react to the resulting metadata updates.
+- and a tracker, consumer, or application protocol can react to the resulting metadata updates.
 
 This is the practical point of the protocol layer: reusable control logic that
 does not depend on bespoke peer-to-peer wiring.
+
+## Entanglement-based QKD with BBM92
+
+[`BBM92Prot`](@ref) is a reusable application-layer consumer for entangled Bell
+pairs. Alice and Bob independently choose X or Z measurement bases, destructively
+measure each pair, and retain only same-basis rounds for the raw sifted key.
+
+```julia
+qkd = BBM92Prot(sim, net, 1, 2; z_basis_probability=0.5)
+@process qkd()
+run(sim, 10.0)
+
+records = bbm92_log(qkd)
+raw_key = sifted_key(qkd)
+```
+
+The primitive deliberately stops at basis sifting. Authentication, parameter
+estimation, error correction, privacy amplification, and attacker modelling are
+separate higher-layer tasks rather than being hidden inside the protocol.
+
+Like `EntanglementConsumer`, `BBM92Prot` revalidates reciprocal pair metadata
+under slot locks before destructive consumption. This prevents a stale query
+from measuring a pair that has been swapped, deleted, or consumed by another
+process while the protocol was waiting.
 
 ## Protocol Logging Context
 
@@ -106,7 +130,7 @@ The current `ProtocolZoo` includes:
 
 - entanglement generation and swapping protocols,
 - metadata tracking helpers,
-- consumer and cutoff protocols,
+- consumer, cutoff, and entanglement-based QKD protocols,
 - switch-style protocols,
 - and QTCP-related controllers and message types.
 
