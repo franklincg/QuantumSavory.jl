@@ -54,8 +54,8 @@ function prepare_diamond_simulation(; failed_path::Symbol=:none,
         swapper = SwapperProt(sim, net, repeater;
             nodeL=(==(1)),
             nodeH=(==(4)),
-            chooseL=firstindex,
-            chooseH=firstindex,
+            chooseL=(_ -> 1),
+            chooseH=(_ -> 1),
             rounds=-1,
             retry_lock_time=0.02,
         )
