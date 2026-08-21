@@ -59,29 +59,32 @@ In practice, that means one protocol can:
 This is the practical point of the protocol layer: reusable control logic that
 does not depend on bespoke peer-to-peer wiring.
 
-## Entanglement-based QKD with BBM92
+## Entanglement-based six-state QKD
 
-[`BBM92Prot`](@ref) is a reusable application-layer consumer for entangled Bell
-pairs. Alice and Bob independently choose X or Z measurement bases, destructively
-measure each pair, and retain only same-basis rounds for the raw sifted key.
+[`SixStateQKDProt`](@ref) is an application-layer consumer for shared Bell
+pairs. Alice and Bob independently choose X, Y, or Z measurement bases and keep
+only same-basis rounds. For the ideal `|Φ⁺⟩` state, Y-basis outcomes are
+anti-correlated; the protocol applies the corresponding Bob-side bit convention
+before computing the sifted key and QBER.
 
 ```julia
-qkd = BBM92Prot(sim, net, 1, 2; z_basis_probability=0.5)
+qkd = SixStateQKDProt(sim, net, 1, 2)
 @process qkd()
 run(sim, 10.0)
 
-records = bbm92_log(qkd)
+records = sixstate_log(qkd)
 raw_key = sifted_key(qkd)
+qber = qber_estimate(qkd)
 ```
 
-The primitive deliberately stops at basis sifting. Authentication, parameter
-estimation, error correction, privacy amplification, and attacker modelling are
-separate higher-layer tasks rather than being hidden inside the protocol.
+The primitive deliberately stops at destructive measurement, basis sifting,
+and raw QBER estimation. Authentication, error correction, privacy
+amplification, and attacker modelling remain separate higher-layer tasks.
 
-Like `EntanglementConsumer`, `BBM92Prot` revalidates reciprocal pair metadata
-under slot locks before destructive consumption. This prevents a stale query
-from measuring a pair that has been swapped, deleted, or consumed by another
-process while the protocol was waiting.
+Like `EntanglementConsumer`, `SixStateQKDProt` revalidates reciprocal pair
+metadata under slot locks before destructive consumption. A pair that was
+swapped, deleted, or consumed while the process was waiting is therefore not
+measured from a stale query snapshot.
 
 ## Protocol Logging Context
 
