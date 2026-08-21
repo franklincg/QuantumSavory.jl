@@ -49,13 +49,14 @@ function prepare_diamond_simulation(; failed_path::Symbol=:none,
         @process entangler()
     end
 
-    # Each repeater only joins pairs from Alice-facing and Bob-facing links.
+    # Each repeater only joins Alice-facing and Bob-facing entanglement.
     for repeater in (2, 3)
         swapper = SwapperProt(sim, net, repeater;
             nodeL=(==(1)),
             nodeH=(==(4)),
+            chooseL=firstindex,
+            chooseH=firstindex,
             rounds=-1,
-            randomize=true,
             retry_lock_time=0.02,
         )
         @process swapper()
